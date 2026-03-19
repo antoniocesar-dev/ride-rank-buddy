@@ -24,8 +24,10 @@ export function DriverRanking() {
   const [editName, setEditName] = useState('');
 
   const startEdit = (driverId: string, currentName: string) => {
+    // Strip the "(driverId)" suffix that dataAdapter appends
+    const cleanName = currentName.replace(new RegExp(`\\s*\\(${driverId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)$`), '');
     setEditingId(driverId);
-    setEditName(currentName);
+    setEditName(cleanName);
   };
 
   const cancelEdit = () => {
