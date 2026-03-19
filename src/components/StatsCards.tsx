@@ -19,8 +19,16 @@ export function StatsCards() {
           </Card>
         )}
       </div>);
-
   }
+
+  // Top 3 average score
+  const sortedDrivers = [...activeDrivers].sort((a, b) => b.pontuacao - a.pontuacao);
+  const top3 = sortedDrivers.slice(0, 3);
+  const top3Avg = top3.length > 0
+    ? Math.round(top3.reduce((a, d) => a + d.pontuacao, 0) / top3.length)
+    : 0;
+
+  const blockedCount = drivers.filter(d => d.status === 'BLOQUEADO').length;
 
   const stats = [
   {
@@ -31,8 +39,8 @@ export function StatsCards() {
     trend: 'up' as const
   },
   {
-    label: 'Pontuação Total',
-    value: activeDrivers.reduce((a, d) => a + d.pontuacao, 0),
+    label: 'Média Top 3',
+    value: top3Avg,
     suffix: ' pts',
     icon: BarChart3,
     trend: 'up' as const
@@ -44,12 +52,11 @@ export function StatsCards() {
     trend: 'neutral' as const
   },
   {
-    label: 'Bloqueios Ativos',
-    value: blocks.filter((b) => b.ativo).length,
+    label: 'Bloqueios',
+    value: blockedCount,
     icon: AlertTriangle,
     trend: 'down' as const
   }];
-
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -80,5 +87,4 @@ export function StatsCards() {
         </Card>
       )}
     </div>);
-
 }

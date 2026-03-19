@@ -57,7 +57,7 @@ export function TripList({ onEvaluate }: TripListProps) {
                 <th className="px-4 py-2.5 text-center font-medium text-muted-foreground">ETA Orig.</th>
                 <th className="px-4 py-2.5 text-center font-medium text-muted-foreground">ETA Dest.</th>
                 <th className="px-4 py-2.5 text-center font-medium text-muted-foreground">Ocorr.</th>
-                <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Score</th>
+                <th className="px-4 py-2.5 text-right font-medium text-muted-foreground">Pontuação</th>
                 <th className="px-4 py-2.5 text-center font-medium text-muted-foreground">Ação</th>
               </tr>
             </thead>
