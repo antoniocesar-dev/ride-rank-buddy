@@ -1,0 +1,1 @@
+ALTER TABLE public.driver_blocks ADD COLUMN IF NOT EXISTS manual_override boolean NOT NULL DEFAULT false;

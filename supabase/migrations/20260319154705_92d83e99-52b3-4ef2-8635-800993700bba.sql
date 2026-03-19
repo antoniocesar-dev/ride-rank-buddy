@@ -1,0 +1,1 @@
+ALTER TABLE public.drivers ADD CONSTRAINT drivers_driver_id_unique UNIQUE (driver_id);
