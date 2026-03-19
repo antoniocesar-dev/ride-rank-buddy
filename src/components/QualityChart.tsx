@@ -23,7 +23,6 @@ export function QualityChart() {
     { name: 'ETA Orig. DELAY', value: Math.round((trips.filter(t => statusNorm(t.status_eta) === 0).length / total) * 100) },
     { name: 'ETA Dest. DELAY', value: Math.round((trips.filter(t => statusNorm(t.status_eta_destino) === 0).length / total) * 100) },
     { name: 'Com Ocorrência', value: Math.round((trips.filter(t => t.ocorrencia).length / total) * 100) },
-    { name: 'Score < 60', value: Math.round((trips.filter(t => t.score_final < 60).length / total) * 100) },
   ];
 
   const getBarColor = (value: number) => {
