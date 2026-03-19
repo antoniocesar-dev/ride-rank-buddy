@@ -29,33 +29,29 @@ function resolveStatus(existing: string, scheduled: string, realized: string): s
   return calculateStatusFromDates(scheduled, realized) || '';
 }
 
-// RF01 — New status conversion for ETA Origem
-function statusValueOrigem(status: string): number {
+// Points for ETA Origem: ON TIME = 1, EARLY = 1, DELAY = 0
+function statusPointOrigem(status: string): number {
   const s = (status || '').trim().toUpperCase();
-  if (s === 'ON TIME') return 1;
-  if (s === 'EARLY') return 0.5;
-  return 0; // DELAY
+  if (s === 'ON TIME' || s === 'EARLY') return 1;
+  return 0;
 }
 
-// RF01 — New status conversion for ETA Destino
-function statusValueDestino(status: string): number {
+// Points for ETA Destino: ON TIME = 1, EARLY = 0, DELAY = 0
+function statusPointDestino(status: string): number {
   const s = (status || '').trim().toUpperCase();
   if (s === 'ON TIME') return 1;
-  return 0; // EARLY and DELAY = 0
+  return 0;
+}
+
+// Trip score = sum of origin + destination points (max 2)
+export function calculateTripScore(trip: { status_eta: string; status_eta_destino: string }): number {
+  return statusPointOrigem(trip.status_eta) + statusPointDestino(trip.status_eta_destino);
 }
 
 function isOcorrenciaValida(value: string, ignoredList: string[]): number {
   if (!value || value.trim() === '' || value.trim() === '-') return 0;
   if (ignoredList.includes(value.trim())) return 0;
   return 1;
-}
-
-// RF01/RF02 — New score formula: (ETA_Origem * 0.5 + ETA_Destino * 0.5) * 100
-export function calculateTripScore(trip: { status_eta: string; status_eta_destino: string }): number {
-  const origem = statusValueOrigem(trip.status_eta);
-  const destino = statusValueDestino(trip.status_eta_destino);
-  const score = (origem * 0.5 + destino * 0.5) * 100;
-  return Math.round(score);
 }
 
 export function extractUniqueOccurrences(sheetTrips: SheetTrip[]): string[] {
@@ -90,9 +86,8 @@ export function transformTrips(sheetTrips: SheetTrip[], ignoredOccurrences: stri
     const resolvedStatusDest = resolveStatus(st.status_eta_destino, st.eta_destination_edited, st.eta_destino_realizado);
     const resolvedStatusCpt = (st.status_cpt || '').trim();
 
-    // RF01/RF02 — Score formula with occurrence penalty (-10 per occurrence)
-    const baseScore = calculateTripScore({ status_eta: resolvedStatusEta, status_eta_destino: resolvedStatusDest });
-    const score_final = Math.max(0, baseScore - (ocorrencia_count * 10));
+    // Trip score: points based on ETA status (max 2)
+    const score_final = calculateTripScore({ status_eta: resolvedStatusEta, status_eta_destino: resolvedStatusDest });
 
     return {
       id: st.trip_number || `t${idx + 1}`,
@@ -140,12 +135,10 @@ export function deriveDrivers(trips: Trip[]): Driver[] {
     const nome = driverTrips[0].driverName;
     const ocorrencias = driverTrips.filter(t => t.ocorrencia).length;
 
-    // Points: 1 per trip + 1 if ETA origin ON TIME + 1 if ETA dest ON TIME
+    // Points: sum of trip scores (ETA Orig + ETA Dest per trip)
     let pontuacao = 0;
     for (const trip of driverTrips) {
-      pontuacao += 1; // 1 point per trip
-      if (trip.status_eta.toUpperCase() === 'ON TIME') pontuacao += 1;
-      if (trip.status_eta_destino.toUpperCase() === 'ON TIME') pontuacao += 1;
+      pontuacao += calculateTripScore({ status_eta: trip.status_eta, status_eta_destino: trip.status_eta_destino });
     }
 
     drivers.push({
