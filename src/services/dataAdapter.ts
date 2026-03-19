@@ -135,12 +135,10 @@ export function deriveDrivers(trips: Trip[]): Driver[] {
     const nome = driverTrips[0].driverName;
     const ocorrencias = driverTrips.filter(t => t.ocorrencia).length;
 
-    // Points: 1 per trip + 1 if ETA origin ON TIME + 1 if ETA dest ON TIME
+    // Points: sum of trip scores (ETA Orig + ETA Dest per trip)
     let pontuacao = 0;
     for (const trip of driverTrips) {
-      pontuacao += 1; // 1 point per trip
-      if (trip.status_eta.toUpperCase() === 'ON TIME') pontuacao += 1;
-      if (trip.status_eta_destino.toUpperCase() === 'ON TIME') pontuacao += 1;
+      pontuacao += calculateTripScore({ status_eta: trip.status_eta, status_eta_destino: trip.status_eta_destino });
     }
 
     drivers.push({
