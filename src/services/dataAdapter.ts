@@ -48,6 +48,12 @@ export function calculateTripScore(trip: { status_eta: string; status_eta_destin
   return statusPointOrigem(trip.status_eta) + statusPointDestino(trip.status_eta_destino);
 }
 
+function isOcorrenciaValida(value: string, ignoredList: string[]): number {
+  if (!value || value.trim() === '' || value.trim() === '-') return 0;
+  if (ignoredList.includes(value.trim())) return 0;
+  return 1;
+}
+
 export function extractUniqueOccurrences(sheetTrips: SheetTrip[]): string[] {
   const set = new Set<string>();
   for (const t of sheetTrips) {
