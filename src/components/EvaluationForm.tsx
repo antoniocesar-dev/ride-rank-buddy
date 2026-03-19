@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { useData } from '@/contexts/DataContext';
 import { useToast } from '@/hooks/use-toast';
+import { blockDriver as blockDriverApi, createEvaluationLog } from '@/services/supabaseService';
 
 interface EvaluationFormProps {
   tripId: string;
@@ -17,7 +18,7 @@ interface EvaluationFormProps {
 }
 
 export function EvaluationForm({ tripId, onClose }: EvaluationFormProps) {
-  const { trips, evaluateTrip, evaluations } = useData();
+  const { trips, evaluateTrip, evaluations, refreshData } = useData();
   const trip = trips.find(t => t.id === tripId);
   const existing = evaluations.find(e => e.trip_id === tripId);
   const { toast } = useToast();
@@ -31,6 +32,7 @@ export function EvaluationForm({ tripId, onClose }: EvaluationFormProps) {
   const [observacao, setObservacao] = useState(existing?.observacao || '');
   const [operador, setOperador] = useState(existing?.operador || 'Ana Costa');
   const [saving, setSaving] = useState(false);
+  const [blocking, setBlocking] = useState(false);
 
   if (!trip) return null;
 
@@ -55,6 +57,45 @@ export function EvaluationForm({ tripId, onClose }: EvaluationFormProps) {
       toast({ title: 'Erro ao salvar', description: 'Tente novamente.', variant: 'destructive' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleBlock = async () => {
+    setBlocking(true);
+    try {
+      await blockDriverApi({
+        driver_id: trip.driver_id,
+        driver_name: trip.driverName,
+        tipo: 'MANUAL',
+        motivo: `Bloqueio manual na avaliação da viagem ${tripId}`,
+        ativo: true,
+        manual_override: false,
+        data_inicio: new Date().toISOString(),
+        data_fim: null,
+        created_by: operador,
+      });
+
+      await createEvaluationLog({
+        driver_id: trip.driver_id,
+        driver_name: trip.driverName,
+        operador,
+        acao: 'BLOQUEIO_MANUAL',
+        dados_antes: null,
+        dados_depois: { status: 'BLOQUEADO', motivo: 'MANUAL', trip_id: tripId },
+      });
+
+      toast({
+        title: 'Motorista bloqueado',
+        description: `${trip.driverName} foi bloqueado manualmente.`,
+        variant: 'destructive',
+      });
+
+      refreshData();
+      onClose();
+    } catch (err) {
+      toast({ title: 'Erro ao bloquear', description: 'Tente novamente.', variant: 'destructive' });
+    } finally {
+      setBlocking(false);
     }
   };
 
@@ -143,9 +184,19 @@ export function EvaluationForm({ tripId, onClose }: EvaluationFormProps) {
           </div>
 
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" onClick={onClose} className="flex-1" disabled={saving}>Cancelar</Button>
-            <Button onClick={handleSubmit} className="flex-1" disabled={saving}>
-              {saving ? 'Salvando...' : existing ? 'Atualizar' : 'Salvar Avaliação'}
+            <Button
+              variant="destructive"
+              onClick={handleBlock}
+              className="gap-1"
+              disabled={saving || blocking}
+            >
+              <ShieldAlert className="h-3.5 w-3.5" />
+              {blocking ? 'Bloqueando...' : 'Bloquear'}
+            </Button>
+            <div className="flex-1" />
+            <Button variant="outline" onClick={onClose} disabled={saving || blocking}>Cancelar</Button>
+            <Button onClick={handleSubmit} disabled={saving || blocking}>
+              {saving ? 'Salvando...' : existing ? 'Atualizar' : 'Salvar'}
             </Button>
           </div>
         </CardContent>

@@ -1,9 +1,12 @@
-import { Trophy, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Trophy, AlertCircle, Pencil, Check, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getStatusVariant } from '@/data/mockData';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useData } from '@/contexts/DataContext';
+import { upsertDrivers } from '@/services/supabaseService';
+import { useToast } from '@/hooks/use-toast';
 
 function MetricCell({ value, type }: { value: number; type: 'onTime' | 'early' | 'delay' }) {
   const color = type === 'onTime'
@@ -15,7 +18,32 @@ function MetricCell({ value, type }: { value: number; type: 'onTime' | 'early' |
 }
 
 export function DriverRanking() {
-  const { activeDrivers, isLoading } = useData();
+  const { activeDrivers, isLoading, refreshData } = useData();
+  const { toast } = useToast();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+
+  const startEdit = (driverId: string, currentName: string) => {
+    setEditingId(driverId);
+    setEditName(currentName);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditName('');
+  };
+
+  const saveEdit = async (driverId: string) => {
+    if (!editName.trim()) return;
+    try {
+      await upsertDrivers([{ driver_id: driverId, driver_name: editName.trim() }]);
+      toast({ title: 'Nome atualizado', description: `Motorista renomeado para ${editName.trim()}.` });
+      refreshData();
+    } catch {
+      toast({ title: 'Erro ao salvar', variant: 'destructive' });
+    }
+    setEditingId(null);
+  };
 
   if (isLoading) {
     return (
@@ -48,7 +76,6 @@ export function DriverRanking() {
               <tr className="border-b bg-muted/50">
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">#</th>
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Motorista</th>
-                <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Status</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Pontos</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Viagens</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Ocorr.</th>
@@ -60,7 +87,7 @@ export function DriverRanking() {
                 </th>
               </tr>
               <tr className="border-b bg-muted/30">
-                <th colSpan={6}></th>
+                <th colSpan={5}></th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground border-l">On Time</th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground">Early</th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground">Delay</th>
@@ -77,13 +104,39 @@ export function DriverRanking() {
                       {String(idx + 1).padStart(2, '0')}
                     </span>
                   </td>
-                  <td className="px-3 py-3 font-medium">{driver.nome}</td>
                   <td className="px-3 py-3">
-                    <div className="flex items-center gap-1">
-                      <Badge variant={getStatusVariant(driver.status)} className="text-[10px]">
-                        {driver.status.replace(/_/g, ' ')}
-                      </Badge>
-                    </div>
+                    {editingId === driver.id ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="h-7 text-sm w-40"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveEdit(driver.id);
+                            if (e.key === 'Escape') cancelEdit();
+                          }}
+                        />
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => saveEdit(driver.id)}>
+                          <Check className="h-3 w-3 text-success" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={cancelEdit}>
+                          <X className="h-3 w-3 text-destructive" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 group">
+                        <span className="font-medium">{driver.nome}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => startEdit(driver.id, driver.nome)}
+                        >
+                          <Pencil className="h-3 w-3 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    )}
                   </td>
                   <td className="px-3 py-3 text-right font-mono font-bold text-foreground">
                     {driver.pontuacao}
