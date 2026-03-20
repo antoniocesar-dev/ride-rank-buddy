@@ -1,11 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
-import { getTrips, SheetTrip } from '@/services/sheetsService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getTrips, SheetTrip, clearCache } from '@/services/sheetsService';
+import { useCallback } from 'react';
 
 export function useTrips() {
-  return useQuery<SheetTrip[]>({
+  const queryClient = useQueryClient();
+
+  const query = useQuery<SheetTrip[]>({
     queryKey: ['sheet-trips'],
     queryFn: getTrips,
-    staleTime: Infinity, // Load once per session
+    staleTime: Infinity,
     retry: 1,
+    enabled: false,
   });
+
+  const refresh = useCallback(() => {
+    clearCache();
+    queryClient.invalidateQueries({ queryKey: ['sheet-trips'] });
+    query.refetch();
+  }, [queryClient, query]);
+
+  return { ...query, refresh };
 }

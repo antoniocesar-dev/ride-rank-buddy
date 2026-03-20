@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText } from 'lucide-react';
+import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StatsCards } from '@/components/StatsCards';
 import { DriverRanking } from '@/components/DriverRanking';
@@ -11,9 +11,12 @@ import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { DriverImport } from '@/components/DriverImport';
+import { Button } from '@/components/ui/button';
+import { useData } from '@/contexts/DataContext';
 
 const Index = () => {
   const [evaluatingTrip, setEvaluatingTrip] = useState<string | null>(null);
+  const { refreshData, isLoading } = useData();
 
   return (
     <div className="min-h-screen bg-background">
@@ -28,9 +31,15 @@ const Index = () => {
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Sistema de Avaliação</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-success animate-pulse-slow" />
-            Operador
+          <div className="flex items-center gap-3">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={refreshData} disabled={isLoading}>
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-success animate-pulse-slow" />
+              Operador
+            </div>
           </div>
         </div>
       </header>
