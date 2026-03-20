@@ -1,5 +1,6 @@
 const SHEET_ID = "1MWTiaXU3HXW_iVn-n70WSk3o8rcHTRrQP2ac07W9cCU";
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+const SHEET_TAB = "DBLHHISTORICO";
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
 
 export interface SheetTrip {
   sta_origin_date: string;
