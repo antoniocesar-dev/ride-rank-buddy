@@ -11,9 +11,12 @@ import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { DriverImport } from '@/components/DriverImport';
+import { Button } from '@/components/ui/button';
+import { useData } from '@/contexts/DataContext';
 
 const Index = () => {
   const [evaluatingTrip, setEvaluatingTrip] = useState<string | null>(null);
+  const { refreshData, isLoading } = useData();
 
   return (
     <div className="min-h-screen bg-background">
