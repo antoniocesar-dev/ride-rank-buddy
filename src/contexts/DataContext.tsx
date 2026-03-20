@@ -78,7 +78,7 @@ const DataContext = createContext<DataContextType>({
 });
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const { data: sheetTrips, isLoading, isError } = useTrips();
+  const { data: sheetTrips, isLoading, isError, refresh: refreshSheet } = useTrips();
   const [ignoredOccurrences, setIgnoredOccurrencesRaw] = useState<string[]>(loadIgnored);
 
   const setIgnoredOccurrences = useCallback((v: string[]) => {
