@@ -99,7 +99,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchDrivers().then(setImportedDrivers).catch(console.error);
   }, [refreshKey]);
 
-  const refreshData = useCallback(() => setRefreshKey(k => k + 1), []);
+  const refreshData = useCallback(() => {
+    refreshSheet();
+    setRefreshKey(k => k + 1);
+  }, [refreshSheet]);
 
   const uniqueOccurrences = useMemo(() => {
     if (sheetTrips && sheetTrips.length > 0) {
