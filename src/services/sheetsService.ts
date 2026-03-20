@@ -1,4 +1,4 @@
-const SHEET_ID = '13o_POmjWZjhIXbNiH-rlxP9kSTBqtQELxtDBz_JvCK8';
+const SHEET_ID = "1MWTiaXU3HXW_iVn-n70WSk3o8rcHTRrQP2ac07W9cCU";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
 export interface SheetTrip {
@@ -41,7 +41,7 @@ export interface SheetTrip {
 
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
-  let current = '';
+  let current = "";
   let inQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
@@ -53,9 +53,9 @@ function parseCSVLine(line: string): string[] {
       } else {
         inQuotes = !inQuotes;
       }
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       result.push(current.trim());
-      current = '';
+      current = "";
     } else {
       current += char;
     }
@@ -65,24 +65,22 @@ function parseCSVLine(line: string): string[] {
 }
 
 function parseCSV(csv: string): SheetTrip[] {
-  const lines = csv.split('\n').filter(line => line.trim() !== '');
+  const lines = csv.split("\n").filter((line) => line.trim() !== "");
   if (lines.length < 2) return [];
 
-  const headers = parseCSVLine(lines[0]).map(h =>
-    h.replace(/^"|"$/g, '').trim()
-  );
+  const headers = parseCSVLine(lines[0]).map((h) => h.replace(/^"|"$/g, "").trim());
 
   const trips: SheetTrip[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
     // Skip empty rows
-    if (values.every(v => v === '' || v === '""')) continue;
+    if (values.every((v) => v === "" || v === '""')) continue;
 
     const row: Record<string, string> = {};
     headers.forEach((header, idx) => {
       if (header) {
-        row[header] = (values[idx] || '').replace(/^"|"$/g, '').trim();
+        row[header] = (values[idx] || "").replace(/^"|"$/g, "").trim();
       }
     });
 
@@ -113,7 +111,7 @@ export async function getTrips(): Promise<SheetTrip[]> {
       console.log(`[SheetsService] Loaded ${cachedTrips.length} trips from Google Sheets`);
       return cachedTrips;
     } catch (error) {
-      console.error('[SheetsService] Error fetching sheet data:', error);
+      console.error("[SheetsService] Error fetching sheet data:", error);
       cachedTrips = [];
       return cachedTrips;
     } finally {
