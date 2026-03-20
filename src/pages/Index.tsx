@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText } from 'lucide-react';
+import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StatsCards } from '@/components/StatsCards';
 import { DriverRanking } from '@/components/DriverRanking';
