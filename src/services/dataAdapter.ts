@@ -40,6 +40,7 @@ function statusPointOrigem(status: string): number {
 function statusPointDestino(status: string): number {
   const s = (status || '').trim().toUpperCase();
   if (s === 'ON TIME') return 1;
+  if (s === 'DELAY') return -1;
   return 0;
 }
 
