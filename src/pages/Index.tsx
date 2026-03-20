@@ -27,7 +27,7 @@ const Index = () => {
               <Activity className="h-4 w-4 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-sm font-bold tracking-tight">DriverScore</h1>
+              <h1 className="text-sm font-bold tracking-tight">RankingMotoristas</h1>
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Sistema de Avaliação</p>
             </div>
           </div>
