@@ -31,9 +31,15 @@ const Index = () => {
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Sistema de Avaliação</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-success animate-pulse-slow" />
-            Operador
+          <div className="flex items-center gap-3">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={refreshData} disabled={isLoading}>
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-success animate-pulse-slow" />
+              Operador
+            </div>
           </div>
         </div>
       </header>
