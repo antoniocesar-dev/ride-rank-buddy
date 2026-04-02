@@ -94,6 +94,10 @@ const Index = () => {
             <BlocksList />
           </TabsContent>
 
+          <TabsContent value="rotas">
+            <RouteScores />
+          </TabsContent>
+
           <TabsContent value="logs">
             <EvaluationLogList />
           </TabsContent>
