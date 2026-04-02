@@ -121,7 +121,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const normalizeId = (id: string) => id.replace(/\./g, '');
       const driverNameMap = new Map(importedDrivers.map(d => [normalizeId(d.driver_id), d.driver_name]));
 
-      let t = transformTrips(sheetTrips, ignoredOccurrences);
+      let t = transformTrips(sheetTrips, ignoredOccurrences, routeScores);
 
       if (driverNameMap.size > 0) {
         t = t.map(trip => {
