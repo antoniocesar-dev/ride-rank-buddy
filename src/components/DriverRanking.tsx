@@ -79,6 +79,7 @@ export function DriverRanking() {
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">#</th>
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Motorista</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Pontos</th>
+                <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Vínculo</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Viagens</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Ocorr.</th>
                 <th className="px-2 py-2.5 text-center font-medium text-muted-foreground border-l" colSpan={3}>
@@ -89,7 +90,7 @@ export function DriverRanking() {
                 </th>
               </tr>
               <tr className="border-b bg-muted/30">
-                <th colSpan={5}></th>
+                <th colSpan={6}></th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground border-l">On Time</th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground">Early</th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground">Delay</th>
@@ -143,6 +144,7 @@ export function DriverRanking() {
                   <td className="px-3 py-3 text-right font-mono font-bold text-foreground">
                     {driver.pontuacao}
                   </td>
+                  <td className="px-3 py-3 text-left text-xs text-muted-foreground">{driver.vinculo}</td>
                   <td className="px-3 py-3 text-right font-mono text-muted-foreground">{driver.totalViagens}</td>
                   <td className="px-3 py-3 text-right">
                     {driver.ocorrencias > 0 ? (

@@ -162,6 +162,7 @@ export function deriveDrivers(trips: Trip[]): Driver[] {
       created_at: driverTrips[0]?.data || '',
       etaOrigMetrics: calcStatusMetrics(driverTrips, 'status_eta'),
       etaDestMetrics: calcStatusMetrics(driverTrips, 'status_eta_destino'),
+      vinculo: '—',
     });
   }
 

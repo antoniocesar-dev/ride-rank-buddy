@@ -3,6 +3,7 @@ import { useTrips } from '@/hooks/useTrips';
 import { transformTrips, deriveDrivers, deriveBlocks, extractUniqueOccurrences, parseDateBR } from '@/services/dataAdapter';
 import { fetchEvaluations, upsertEvaluation, fetchDriverBlocks, unblockDriver as unblockDriverApi, resetManualOverride, createEvaluationLog, fetchDrivers, blockDriver as blockDriverApi, EvaluationRecord, DriverBlockRecord, DriverRecord } from '@/services/supabaseService';
 import { fetchRouteScores, RouteScoreRecord } from '@/services/routeScoreService';
+import { fetchVinculos, getVinculoForDriver, VinculoRecord, clearVinculoCache } from '@/services/vinculoService';
 import type { Trip, Driver, Block } from '@/data/mockData';
 import { mockTrips, mockDrivers, mockBlocks } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
@@ -93,6 +94,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [manualBlocks, setManualBlocks] = useState<DriverBlockRecord[]>([]);
   const [importedDrivers, setImportedDrivers] = useState<DriverRecord[]>([]);
   const [routeScores, setRouteScores] = useState<RouteScoreRecord[]>([]);
+  const [vinculos, setVinculos] = useState<VinculoRecord[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
 
@@ -102,10 +104,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchDriverBlocks().then(setManualBlocks).catch(console.error);
     fetchDrivers().then(setImportedDrivers).catch(console.error);
     fetchRouteScores().then(setRouteScores).catch(console.error);
+    fetchVinculos().then(setVinculos).catch(console.error);
   }, [refreshKey]);
 
   const refreshData = useCallback(() => {
     refreshSheet();
+    clearVinculoCache();
     setRefreshKey(k => k + 1);
   }, [refreshSheet]);
 
@@ -165,10 +169,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       // Status: only ATIVO or BLOQUEADO (blocked only by NO_SHOW or MANUAL)
       const adjustedDrivers: Driver[] = d.map(driver => {
+        // Extract clean name (without ID suffix) for vinculo matching
+        const cleanName = driver.nome.replace(/\s*\([^)]*\)$/, '');
+        const vinculo = getVinculoForDriver(vinculos, cleanName);
+        const base = { ...driver, vinculo };
         if (activelyBlockedIds.has(driver.id)) {
-          return { ...driver, status: 'BLOQUEADO' as const };
+          return { ...base, status: 'BLOQUEADO' as const };
         }
-        return { ...driver, status: 'ATIVO' as const };
+        return { ...base, status: 'ATIVO' as const };
       });
 
       const b = deriveBlocks(adjustedDrivers);
@@ -183,7 +191,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return { trips: mockTrips, drivers: mockDrivers, blocks: mockBlocks, activeDrivers: active };
     }
     return { trips: [] as Trip[], drivers: [] as Driver[], blocks: [] as Block[], activeDrivers: [] as Driver[] };
-  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers, routeScores]);
+  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers, routeScores, vinculos]);
 
   const evaluateTrip = useCallback(async (tripId: string, driverId: string, driverName: string, evaluation: EvaluationData) => {
     const operador = evaluation.operador || 'Ana Costa';
