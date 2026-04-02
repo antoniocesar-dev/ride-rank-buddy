@@ -146,10 +146,10 @@ export function deriveDrivers(trips: Trip[]): Driver[] {
     const nome = driverTrips[0].driverName;
     const ocorrencias = driverTrips.filter(t => t.ocorrencia).length;
 
-    // Points: sum of trip scores (ETA Orig + ETA Dest per trip)
+    // Use pre-calculated score_final which already includes route-specific base points
     let pontuacao = 0;
     for (const trip of driverTrips) {
-      pontuacao += calculateTripScore({ status_eta: trip.status_eta, status_eta_destino: trip.status_eta_destino });
+      pontuacao += trip.score_final;
     }
 
     drivers.push({
