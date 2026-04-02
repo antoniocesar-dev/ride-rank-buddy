@@ -19,7 +19,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export function TripList({ onEvaluate }: TripListProps) {
-  const { trips, isLoading } = useData();
+  const { trips, isLoading, routeScores } = useData();
 
   if (isLoading) {
     return (
