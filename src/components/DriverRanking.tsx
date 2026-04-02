@@ -84,10 +84,24 @@ export function DriverRanking() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="flex items-center gap-2 text-base flex-wrap">
           <Trophy className="h-4 w-4 text-accent" />
           Ranking de Motoristas
-          <span className="text-xs font-normal text-muted-foreground ml-auto">{activeDrivers.length} motoristas</span>
+          <div className="flex items-center gap-2 ml-auto">
+            <Select value={vinculoFilter} onValueChange={setVinculoFilter}>
+              <SelectTrigger className="h-7 w-[160px] text-xs">
+                <Filter className="h-3 w-3 mr-1" />
+                <SelectValue placeholder="Vínculo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {vinculoTypes.map(t => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-xs font-normal text-muted-foreground">{filteredDrivers.length} motoristas</span>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
