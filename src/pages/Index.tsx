@@ -71,6 +71,7 @@ const Index = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <DriverImport />
             <OccurrenceFilter />
+            <VinculoFilter vinculoTypes={vinculoTypes} selectedVinculos={selectedVinculos} setSelectedVinculos={setSelectedVinculos} />
           </div>
         </div>
 
