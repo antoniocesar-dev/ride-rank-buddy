@@ -94,6 +94,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [manualBlocks, setManualBlocks] = useState<DriverBlockRecord[]>([]);
   const [importedDrivers, setImportedDrivers] = useState<DriverRecord[]>([]);
   const [routeScores, setRouteScores] = useState<RouteScoreRecord[]>([]);
+  const [vinculos, setVinculos] = useState<VinculoRecord[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
 
