@@ -76,6 +76,7 @@ const DataContext = createContext<DataContextType>({
   setDateRange: () => {},
   evaluations: [],
   manualBlocks: [],
+  routeScores: [],
   refreshData: () => {},
 });
 
