@@ -8,6 +8,7 @@ import { getRouteBasePoints } from '@/services/routeScoreService';
 
 interface TripListProps {
   onEvaluate: (tripId: string) => void;
+  selectedVinculos?: string[];
 }
 
 function StatusBadge({ status }: { status: string }) {
