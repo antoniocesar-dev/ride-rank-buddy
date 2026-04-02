@@ -27,6 +27,8 @@ export interface Trip {
   driver_id: string;
   driverName: string;
   data: string;
+  origin_code: string;
+  destination_code: string;
   status_eta: string;
   status_eta_destino: string;
   status_cpt: string;
