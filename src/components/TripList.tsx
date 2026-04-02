@@ -73,7 +73,7 @@ export function TripList({ onEvaluate, selectedVinculos = [] }: TripListProps) {
               </tr>
             </thead>
             <tbody>
-              {trips.map((trip) => (
+              {filteredTrips.map((trip) => (
                 <tr key={trip.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground max-w-[120px] truncate">{trip.id}</td>
                   <td className="px-4 py-3 font-mono text-xs">{trip.driver_id}</td>
