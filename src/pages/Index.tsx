@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw, Route } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StatsCards } from '@/components/StatsCards';
@@ -9,6 +9,7 @@ import { QualityChart } from '@/components/QualityChart';
 import { EvaluationForm } from '@/components/EvaluationForm';
 import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
+import { VinculoFilter } from '@/components/VinculoFilter';
 import { RouteScores } from '@/components/RouteScores';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { DriverImport } from '@/components/DriverImport';
