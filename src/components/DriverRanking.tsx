@@ -133,7 +133,7 @@ export function DriverRanking() {
               </tr>
             </thead>
             <tbody>
-              {activeDrivers.map((driver, idx) => (
+              {filteredDrivers.map((driver, idx) => (
                 <tr key={driver.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="px-3 py-3">
                     <span className={`font-mono font-bold text-xs ${idx < 3 ? 'text-accent' : 'text-muted-foreground'}`}>
