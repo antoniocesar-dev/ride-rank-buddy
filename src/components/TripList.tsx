@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { FileText, Pencil } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +9,7 @@ import { getRouteBasePoints } from '@/services/routeScoreService';
 
 interface TripListProps {
   onEvaluate: (tripId: string) => void;
+  selectedVinculos?: string[];
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -18,8 +20,17 @@ function StatusBadge({ status }: { status: string }) {
   return <span className="text-xs text-muted-foreground">{status}</span>;
 }
 
-export function TripList({ onEvaluate }: TripListProps) {
-  const { trips, isLoading, routeScores } = useData();
+export function TripList({ onEvaluate, selectedVinculos = [] }: TripListProps) {
+  const { trips, isLoading, routeScores, activeDrivers } = useData();
+
+  const filteredTrips = useMemo(() => {
+    if (selectedVinculos.length === 0) return trips;
+    return trips.filter(trip => {
+      const driver = activeDrivers.find(d => d.id === trip.driver_id);
+      const v = !driver?.vinculo || driver.vinculo === '—' ? 'Terceiros' : driver.vinculo;
+      return selectedVinculos.includes(v);
+    });
+  }, [trips, selectedVinculos, activeDrivers]);
 
   if (isLoading) {
     return (
@@ -42,7 +53,7 @@ export function TripList({ onEvaluate }: TripListProps) {
         <CardTitle className="flex items-center gap-2 text-base">
           <FileText className="h-4 w-4 text-accent" />
           Viagens Recentes
-          <span className="text-xs font-normal text-muted-foreground ml-auto">{trips.length} viagens</span>
+          <span className="text-xs font-normal text-muted-foreground ml-auto">{filteredTrips.length} viagens</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -62,7 +73,7 @@ export function TripList({ onEvaluate }: TripListProps) {
               </tr>
             </thead>
             <tbody>
-              {trips.map((trip) => (
+              {filteredTrips.map((trip) => (
                 <tr key={trip.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground max-w-[120px] truncate">{trip.id}</td>
                   <td className="px-4 py-3 font-mono text-xs">{trip.driver_id}</td>

@@ -102,7 +102,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="viagens">
-            <TripList onEvaluate={setEvaluatingTrip} />
+            <TripList onEvaluate={setEvaluatingTrip} selectedVinculos={selectedVinculos} />
           </TabsContent>
 
           <TabsContent value="qualidade">
