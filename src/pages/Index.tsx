@@ -70,6 +70,9 @@ const Index = () => {
             <TabsTrigger value="bloqueios" className="gap-1.5 text-xs">
               <ShieldAlert className="h-3.5 w-3.5" /> Bloqueios
             </TabsTrigger>
+            <TabsTrigger value="rotas" className="gap-1.5 text-xs">
+              <Route className="h-3.5 w-3.5" /> Rotas
+            </TabsTrigger>
             <TabsTrigger value="logs" className="gap-1.5 text-xs">
               <ScrollText className="h-3.5 w-3.5" /> Logs
             </TabsTrigger>
