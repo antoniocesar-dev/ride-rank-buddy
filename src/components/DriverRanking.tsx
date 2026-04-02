@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Trophy, AlertCircle, Pencil, Check, X } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Trophy, AlertCircle, Pencil, Check, X, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/DataContext';
 import { upsertDrivers } from '@/services/supabaseService';
 import { useToast } from '@/hooks/use-toast';
