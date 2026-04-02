@@ -23,6 +23,24 @@ export function DriverRanking() {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [vinculoFilter, setVinculoFilter] = useState<string>('all');
+
+  // Extract unique vínculo types, treating '—' as 'Terceiros'
+  const vinculoTypes = useMemo(() => {
+    const types = new Set<string>();
+    activeDrivers.forEach(d => {
+      types.add(!d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo);
+    });
+    return Array.from(types).sort();
+  }, [activeDrivers]);
+
+  const filteredDrivers = useMemo(() => {
+    if (vinculoFilter === 'all') return activeDrivers;
+    return activeDrivers.filter(d => {
+      const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
+      return v === vinculoFilter;
+    });
+  }, [activeDrivers, vinculoFilter]);
 
   const startEdit = (driverId: string, currentName: string) => {
     // Strip the "(driverId)" suffix that dataAdapter appends
