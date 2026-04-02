@@ -79,6 +79,7 @@ export function DriverRanking() {
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">#</th>
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Motorista</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Pontos</th>
+                <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Vínculo</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Viagens</th>
                 <th className="px-3 py-2.5 text-right font-medium text-muted-foreground">Ocorr.</th>
                 <th className="px-2 py-2.5 text-center font-medium text-muted-foreground border-l" colSpan={3}>

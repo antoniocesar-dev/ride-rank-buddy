@@ -190,7 +190,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return { trips: mockTrips, drivers: mockDrivers, blocks: mockBlocks, activeDrivers: active };
     }
     return { trips: [] as Trip[], drivers: [] as Driver[], blocks: [] as Block[], activeDrivers: [] as Driver[] };
-  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers, routeScores]);
+  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers, routeScores, vinculos]);
 
   const evaluateTrip = useCallback(async (tripId: string, driverId: string, driverName: string, evaluation: EvaluationData) => {
     const operador = evaluation.operador || 'Ana Costa';
