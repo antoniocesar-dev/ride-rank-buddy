@@ -45,9 +45,9 @@ function statusPointDestino(status: string): number {
   return 0;
 }
 
-// Trip score = 1 (base for completing trip) + origin + destination points (max 3)
-export function calculateTripScore(trip: { status_eta: string; status_eta_destino: string }): number {
-  return 1 + statusPointOrigem(trip.status_eta) + statusPointDestino(trip.status_eta_destino);
+// Trip score = base (from route config, default 1) + origin + destination points
+export function calculateTripScore(trip: { status_eta: string; status_eta_destino: string }, basePoints: number = 1): number {
+  return basePoints + statusPointOrigem(trip.status_eta) + statusPointDestino(trip.status_eta_destino);
 }
 
 function isOcorrenciaValida(value: string, ignoredList: string[]): number {
