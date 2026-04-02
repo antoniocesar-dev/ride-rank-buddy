@@ -296,7 +296,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       trips, drivers, blocks, activeDrivers, isLoading, isError,
       uniqueOccurrences, ignoredOccurrences, setIgnoredOccurrences,
       evaluateTrip, unblockDriver: unblockDriverFn,
-      dateRange, setDateRange, evaluations, manualBlocks, refreshData,
+      dateRange, setDateRange, evaluations, manualBlocks, routeScores, refreshData,
     }}>
       {children}
     </DataContext.Provider>
