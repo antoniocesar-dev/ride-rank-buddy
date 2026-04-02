@@ -89,6 +89,7 @@ export const mockDrivers: Driver[] = driverNames.map((nome, i) => {
     created_at: '2025-01-15',
     etaOrigMetrics: defaultMetrics,
     etaDestMetrics: defaultMetrics,
+    vinculo: '—',
   };
 }).sort((a, b) => b.pontuacao - a.pontuacao);
 
