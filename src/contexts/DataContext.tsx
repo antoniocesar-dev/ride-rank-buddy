@@ -168,10 +168,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       // Status: only ATIVO or BLOQUEADO (blocked only by NO_SHOW or MANUAL)
       const adjustedDrivers: Driver[] = d.map(driver => {
+        // Extract clean name (without ID suffix) for vinculo matching
+        const cleanName = driver.nome.replace(/\s*\([^)]*\)$/, '');
+        const vinculo = getVinculoForDriver(vinculos, cleanName);
+        const base = { ...driver, vinculo };
         if (activelyBlockedIds.has(driver.id)) {
-          return { ...driver, status: 'BLOQUEADO' as const };
+          return { ...base, status: 'BLOQUEADO' as const };
         }
-        return { ...driver, status: 'ATIVO' as const };
+        return { ...base, status: 'ATIVO' as const };
       });
 
       const b = deriveBlocks(adjustedDrivers);
