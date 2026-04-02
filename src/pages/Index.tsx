@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw, Route } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StatsCards } from '@/components/StatsCards';
@@ -9,6 +9,7 @@ import { QualityChart } from '@/components/QualityChart';
 import { EvaluationForm } from '@/components/EvaluationForm';
 import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
+import { VinculoFilter } from '@/components/VinculoFilter';
 import { RouteScores } from '@/components/RouteScores';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { DriverImport } from '@/components/DriverImport';
@@ -17,7 +18,24 @@ import { useData } from '@/contexts/DataContext';
 
 const Index = () => {
   const [evaluatingTrip, setEvaluatingTrip] = useState<string | null>(null);
-  const { refreshData, isLoading } = useData();
+  const { activeDrivers, refreshData, isLoading } = useData();
+  const [selectedVinculos, setSelectedVinculos] = useState<string[]>([]);
+
+  const vinculoTypes = useMemo(() => {
+    const types = new Set<string>();
+    activeDrivers.forEach(d => {
+      types.add(!d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo);
+    });
+    return Array.from(types).sort();
+  }, [activeDrivers]);
+
+  const filteredDrivers = useMemo(() => {
+    if (selectedVinculos.length === 0) return activeDrivers;
+    return activeDrivers.filter(d => {
+      const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
+      return selectedVinculos.includes(v);
+    });
+  }, [activeDrivers, selectedVinculos]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,6 +71,7 @@ const Index = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <DriverImport />
             <OccurrenceFilter />
+            <VinculoFilter vinculoTypes={vinculoTypes} selectedVinculos={selectedVinculos} setSelectedVinculos={setSelectedVinculos} />
           </div>
         </div>
 
@@ -79,7 +98,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="ranking">
-            <DriverRanking />
+            <DriverRanking filteredDrivers={filteredDrivers} />
           </TabsContent>
 
           <TabsContent value="viagens">
