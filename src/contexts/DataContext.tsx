@@ -109,6 +109,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const refreshData = useCallback(() => {
     refreshSheet();
+    clearVinculoCache();
     setRefreshKey(k => k + 1);
   }, [refreshSheet]);
 
