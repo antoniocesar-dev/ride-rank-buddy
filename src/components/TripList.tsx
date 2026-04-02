@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getScoreColor } from '@/data/mockData';
 import { useData } from '@/contexts/DataContext';
+import { getRouteBasePoints } from '@/services/routeScoreService';
 
 interface TripListProps {
   onEvaluate: (tripId: string) => void;
