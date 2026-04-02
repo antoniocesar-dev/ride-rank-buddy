@@ -53,7 +53,7 @@ export function TripList({ onEvaluate, selectedVinculos = [] }: TripListProps) {
         <CardTitle className="flex items-center gap-2 text-base">
           <FileText className="h-4 w-4 text-accent" />
           Viagens Recentes
-          <span className="text-xs font-normal text-muted-foreground ml-auto">{trips.length} viagens</span>
+          <span className="text-xs font-normal text-muted-foreground ml-auto">{filteredTrips.length} viagens</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
