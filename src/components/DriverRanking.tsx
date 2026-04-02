@@ -90,7 +90,7 @@ export function DriverRanking() {
                 </th>
               </tr>
               <tr className="border-b bg-muted/30">
-                <th colSpan={5}></th>
+                <th colSpan={6}></th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground border-l">On Time</th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground">Early</th>
                 <th className="px-2 py-1 text-center text-[10px] text-muted-foreground">Delay</th>
