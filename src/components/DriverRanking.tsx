@@ -1,15 +1,13 @@
-import { useState, useMemo } from 'react';
-import { Trophy, AlertCircle, Pencil, Check, X, Filter } from 'lucide-react';
+import { useState } from 'react';
+import { Trophy, AlertCircle, Pencil, Check, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
 import { useData } from '@/contexts/DataContext';
 import { upsertDrivers } from '@/services/supabaseService';
 import { useToast } from '@/hooks/use-toast';
+import type { Driver } from '@/data/mockData';
 
 function MetricCell({ value, type }: { value: number; type: 'onTime' | 'early' | 'delay' }) {
   const color = type === 'onTime'
@@ -20,35 +18,15 @@ function MetricCell({ value, type }: { value: number; type: 'onTime' | 'early' |
   return <span className={`font-mono text-xs ${color}`}>{value.toFixed(1)}%</span>;
 }
 
-export function DriverRanking() {
-  const { activeDrivers, isLoading, refreshData } = useData();
+interface DriverRankingProps {
+  filteredDrivers: Driver[];
+}
+
+export function DriverRanking({ filteredDrivers }: DriverRankingProps) {
+  const { isLoading, refreshData } = useData();
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [selectedVinculos, setSelectedVinculos] = useState<string[]>([]);
-
-  // Extract unique vínculo types, treating '—' as 'Terceiros'
-  const vinculoTypes = useMemo(() => {
-    const types = new Set<string>();
-    activeDrivers.forEach(d => {
-      types.add(!d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo);
-    });
-    return Array.from(types).sort();
-  }, [activeDrivers]);
-
-  const toggleVinculo = (v: string) => {
-    setSelectedVinculos(prev =>
-      prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]
-    );
-  };
-
-  const filteredDrivers = useMemo(() => {
-    if (selectedVinculos.length === 0) return activeDrivers;
-    return activeDrivers.filter(d => {
-      const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
-      return selectedVinculos.includes(v);
-    });
-  }, [activeDrivers, selectedVinculos]);
 
   const startEdit = (driverId: string, currentName: string) => {
     // Strip the "(driverId)" suffix that dataAdapter appends
