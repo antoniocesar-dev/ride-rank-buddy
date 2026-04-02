@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw } from 'lucide-react';
+import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw, Route } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StatsCards } from '@/components/StatsCards';
 import { DriverRanking } from '@/components/DriverRanking';
@@ -9,6 +9,7 @@ import { QualityChart } from '@/components/QualityChart';
 import { EvaluationForm } from '@/components/EvaluationForm';
 import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
+import { RouteScores } from '@/components/RouteScores';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { DriverImport } from '@/components/DriverImport';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,9 @@ const Index = () => {
             <TabsTrigger value="bloqueios" className="gap-1.5 text-xs">
               <ShieldAlert className="h-3.5 w-3.5" /> Bloqueios
             </TabsTrigger>
+            <TabsTrigger value="rotas" className="gap-1.5 text-xs">
+              <Route className="h-3.5 w-3.5" /> Rotas
+            </TabsTrigger>
             <TabsTrigger value="logs" className="gap-1.5 text-xs">
               <ScrollText className="h-3.5 w-3.5" /> Logs
             </TabsTrigger>
@@ -88,6 +92,10 @@ const Index = () => {
 
           <TabsContent value="bloqueios">
             <BlocksList />
+          </TabsContent>
+
+          <TabsContent value="rotas">
+            <RouteScores />
           </TabsContent>
 
           <TabsContent value="logs">

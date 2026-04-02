@@ -164,6 +164,42 @@ export type Database = {
         }
         Relationships: []
       }
+      route_scores: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string
+          destination_code: string
+          id: string
+          observacao: string | null
+          origin_code: string
+          pontuacao: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          destination_code: string
+          id?: string
+          observacao?: string | null
+          origin_code: string
+          pontuacao?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          destination_code?: string
+          id?: string
+          observacao?: string | null
+          origin_code?: string
+          pontuacao?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

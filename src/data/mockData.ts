@@ -27,6 +27,8 @@ export interface Trip {
   driver_id: string;
   driverName: string;
   data: string;
+  origin_code: string;
+  destination_code: string;
   status_eta: string;
   status_eta_destino: string;
   status_cpt: string;
@@ -115,6 +117,8 @@ for (let i = 0; i < 40; i++) {
     driver_id: driver.id,
     driverName: driver.nome,
     data: `2025-03-${String(1 + (i % 17)).padStart(2, '0')} 07:00`,
+    origin_code: 'ORI',
+    destination_code: 'DST',
     status_eta: sEta,
     status_eta_destino: sDest,
     status_cpt: sCpt,

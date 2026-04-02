@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect, R
 import { useTrips } from '@/hooks/useTrips';
 import { transformTrips, deriveDrivers, deriveBlocks, extractUniqueOccurrences, parseDateBR } from '@/services/dataAdapter';
 import { fetchEvaluations, upsertEvaluation, fetchDriverBlocks, unblockDriver as unblockDriverApi, resetManualOverride, createEvaluationLog, fetchDrivers, blockDriver as blockDriverApi, EvaluationRecord, DriverBlockRecord, DriverRecord } from '@/services/supabaseService';
+import { fetchRouteScores, RouteScoreRecord } from '@/services/routeScoreService';
 import type { Trip, Driver, Block } from '@/data/mockData';
 import { mockTrips, mockDrivers, mockBlocks } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
@@ -55,6 +56,7 @@ interface DataContextType {
   setDateRange: (v: DateRange) => void;
   evaluations: EvaluationRecord[];
   manualBlocks: DriverBlockRecord[];
+  routeScores: RouteScoreRecord[];
   refreshData: () => void;
 }
 
@@ -74,6 +76,7 @@ const DataContext = createContext<DataContextType>({
   setDateRange: () => {},
   evaluations: [],
   manualBlocks: [],
+  routeScores: [],
   refreshData: () => {},
 });
 
@@ -89,6 +92,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [evaluations, setEvaluations] = useState<EvaluationRecord[]>([]);
   const [manualBlocks, setManualBlocks] = useState<DriverBlockRecord[]>([]);
   const [importedDrivers, setImportedDrivers] = useState<DriverRecord[]>([]);
+  const [routeScores, setRouteScores] = useState<RouteScoreRecord[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
 
@@ -97,6 +101,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchEvaluations().then(setEvaluations).catch(console.error);
     fetchDriverBlocks().then(setManualBlocks).catch(console.error);
     fetchDrivers().then(setImportedDrivers).catch(console.error);
+    fetchRouteScores().then(setRouteScores).catch(console.error);
   }, [refreshKey]);
 
   const refreshData = useCallback(() => {
@@ -116,7 +121,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const normalizeId = (id: string) => id.replace(/\./g, '');
       const driverNameMap = new Map(importedDrivers.map(d => [normalizeId(d.driver_id), d.driver_name]));
 
-      let t = transformTrips(sheetTrips, ignoredOccurrences);
+      let t = transformTrips(sheetTrips, ignoredOccurrences, routeScores);
 
       if (driverNameMap.size > 0) {
         t = t.map(trip => {
@@ -178,7 +183,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return { trips: mockTrips, drivers: mockDrivers, blocks: mockBlocks, activeDrivers: active };
     }
     return { trips: [] as Trip[], drivers: [] as Driver[], blocks: [] as Block[], activeDrivers: [] as Driver[] };
-  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers]);
+  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers, routeScores]);
 
   const evaluateTrip = useCallback(async (tripId: string, driverId: string, driverName: string, evaluation: EvaluationData) => {
     const operador = evaluation.operador || 'Ana Costa';
@@ -291,7 +296,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       trips, drivers, blocks, activeDrivers, isLoading, isError,
       uniqueOccurrences, ignoredOccurrences, setIgnoredOccurrences,
       evaluateTrip, unblockDriver: unblockDriverFn,
-      dateRange, setDateRange, evaluations, manualBlocks, refreshData,
+      dateRange, setDateRange, evaluations, manualBlocks, routeScores, refreshData,
     }}>
       {children}
     </DataContext.Provider>
