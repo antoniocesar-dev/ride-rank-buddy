@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Trophy, AlertCircle, Pencil, Check, X } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Trophy, AlertCircle, Pencil, Check, X, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useData } from '@/contexts/DataContext';
 import { upsertDrivers } from '@/services/supabaseService';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +23,24 @@ export function DriverRanking() {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [vinculoFilter, setVinculoFilter] = useState<string>('all');
+
+  // Extract unique vínculo types, treating '—' as 'Terceiros'
+  const vinculoTypes = useMemo(() => {
+    const types = new Set<string>();
+    activeDrivers.forEach(d => {
+      types.add(!d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo);
+    });
+    return Array.from(types).sort();
+  }, [activeDrivers]);
+
+  const filteredDrivers = useMemo(() => {
+    if (vinculoFilter === 'all') return activeDrivers;
+    return activeDrivers.filter(d => {
+      const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
+      return v === vinculoFilter;
+    });
+  }, [activeDrivers, vinculoFilter]);
 
   const startEdit = (driverId: string, currentName: string) => {
     // Strip the "(driverId)" suffix that dataAdapter appends
@@ -65,10 +84,24 @@ export function DriverRanking() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="flex items-center gap-2 text-base flex-wrap">
           <Trophy className="h-4 w-4 text-accent" />
           Ranking de Motoristas
-          <span className="text-xs font-normal text-muted-foreground ml-auto">{activeDrivers.length} motoristas</span>
+          <div className="flex items-center gap-2 ml-auto">
+            <Select value={vinculoFilter} onValueChange={setVinculoFilter}>
+              <SelectTrigger className="h-7 w-[160px] text-xs">
+                <Filter className="h-3 w-3 mr-1" />
+                <SelectValue placeholder="Vínculo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {vinculoTypes.map(t => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-xs font-normal text-muted-foreground">{filteredDrivers.length} motoristas</span>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -100,7 +133,7 @@ export function DriverRanking() {
               </tr>
             </thead>
             <tbody>
-              {activeDrivers.map((driver, idx) => (
+              {filteredDrivers.map((driver, idx) => (
                 <tr key={driver.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="px-3 py-3">
                     <span className={`font-mono font-bold text-xs ${idx < 3 ? 'text-accent' : 'text-muted-foreground'}`}>
@@ -144,7 +177,7 @@ export function DriverRanking() {
                   <td className="px-3 py-3 text-right font-mono font-bold text-foreground">
                     {driver.pontuacao}
                   </td>
-                  <td className="px-3 py-3 text-left text-xs text-muted-foreground">{driver.vinculo}</td>
+                  <td className="px-3 py-3 text-left text-xs text-muted-foreground">{!driver.vinculo || driver.vinculo === '—' ? 'Terceiros' : driver.vinculo}</td>
                   <td className="px-3 py-3 text-right font-mono text-muted-foreground">{driver.totalViagens}</td>
                   <td className="px-3 py-3 text-right">
                     {driver.ocorrencias > 0 ? (
