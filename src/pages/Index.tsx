@@ -98,7 +98,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="ranking">
-            <DriverRanking />
+            <DriverRanking filteredDrivers={filteredDrivers} />
           </TabsContent>
 
           <TabsContent value="viagens">
