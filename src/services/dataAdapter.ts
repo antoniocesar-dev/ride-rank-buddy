@@ -68,7 +68,7 @@ export function extractUniqueOccurrences(sheetTrips: SheetTrip[]): string[] {
   return Array.from(set).sort();
 }
 
-export function transformTrips(sheetTrips: SheetTrip[], ignoredOccurrences: string[] = []): Trip[] {
+export function transformTrips(sheetTrips: SheetTrip[], ignoredOccurrences: string[] = [], routeScores: RouteScoreRecord[] = []): Trip[] {
   const validTrips = sheetTrips.filter(st => {
     if (!st.driver_id || st.driver_id === '0') return false;
     const statusAgrupado = (st.status_agrupado || '').trim().toUpperCase();
@@ -89,14 +89,22 @@ export function transformTrips(sheetTrips: SheetTrip[], ignoredOccurrences: stri
     const resolvedStatusDest = resolveStatus(st.status_eta_destino, st.eta_destination_edited, st.eta_destino_realizado);
     const resolvedStatusCpt = (st.status_cpt || '').trim();
 
-    // Trip score: points based on ETA status (max 2)
-    const score_final = calculateTripScore({ status_eta: resolvedStatusEta, status_eta_destino: resolvedStatusDest });
+    const originCode = (st.origin_station_code || '').trim();
+    const destCode = (st.destination_station_code || '').trim();
+    const tripDate = st.eta_scheduled_origin_edited || st.sta_origin_date || '';
+
+    // Get route-specific base points
+    const basePoints = getRouteBasePoints(routeScores, originCode, destCode, tripDate || undefined);
+
+    const score_final = calculateTripScore({ status_eta: resolvedStatusEta, status_eta_destino: resolvedStatusDest }, basePoints);
 
     return {
       id: st.trip_number || `t${idx + 1}`,
       driver_id: st.driver_id,
       driverName: st.driver_name && st.driver_name !== '-' ? st.driver_name : st.used_agency_name || 'Não atribuído',
-      data: st.eta_scheduled_origin_edited || st.sta_origin_date || '',
+      data: tripDate,
+      origin_code: originCode,
+      destination_code: destCode,
       status_eta: resolvedStatusEta || '—',
       status_eta_destino: resolvedStatusDest || '—',
       status_cpt: resolvedStatusCpt || '—',
