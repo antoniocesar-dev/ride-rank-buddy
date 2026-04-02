@@ -19,8 +19,17 @@ function StatusBadge({ status }: { status: string }) {
   return <span className="text-xs text-muted-foreground">{status}</span>;
 }
 
-export function TripList({ onEvaluate }: TripListProps) {
-  const { trips, isLoading, routeScores } = useData();
+export function TripList({ onEvaluate, selectedVinculos = [] }: TripListProps) {
+  const { trips, isLoading, routeScores, activeDrivers } = useData();
+
+  const filteredTrips = useMemo(() => {
+    if (selectedVinculos.length === 0) return trips;
+    return trips.filter(trip => {
+      const driver = activeDrivers.find(d => d.id === trip.driver_id);
+      const v = !driver?.vinculo || driver.vinculo === '—' ? 'Terceiros' : driver.vinculo;
+      return selectedVinculos.includes(v);
+    });
+  }, [trips, selectedVinculos, activeDrivers]);
 
   if (isLoading) {
     return (
