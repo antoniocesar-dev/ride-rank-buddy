@@ -1,4 +1,5 @@
 import { SheetTrip } from '@/services/sheetsService';
+import { RouteScoreRecord, getRouteBasePoints } from '@/services/routeScoreService';
 import type { Driver, DriverStatus, Trip, Block, StatusMetrics } from '@/data/mockData';
 
 export function parseDateBR(dateStr: string): Date | null {
