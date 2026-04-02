@@ -18,7 +18,24 @@ import { useData } from '@/contexts/DataContext';
 
 const Index = () => {
   const [evaluatingTrip, setEvaluatingTrip] = useState<string | null>(null);
-  const { refreshData, isLoading } = useData();
+  const { activeDrivers, refreshData, isLoading } = useData();
+  const [selectedVinculos, setSelectedVinculos] = useState<string[]>([]);
+
+  const vinculoTypes = useMemo(() => {
+    const types = new Set<string>();
+    activeDrivers.forEach(d => {
+      types.add(!d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo);
+    });
+    return Array.from(types).sort();
+  }, [activeDrivers]);
+
+  const filteredDrivers = useMemo(() => {
+    if (selectedVinculos.length === 0) return activeDrivers;
+    return activeDrivers.filter(d => {
+      const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
+      return selectedVinculos.includes(v);
+    });
+  }, [activeDrivers, selectedVinculos]);
 
   return (
     <div className="min-h-screen bg-background">
