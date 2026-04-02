@@ -25,7 +25,7 @@ export function DriverRanking() {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [vinculoFilter, setVinculoFilter] = useState<string>('all');
+  const [selectedVinculos, setSelectedVinculos] = useState<string[]>([]);
 
   // Extract unique vínculo types, treating '—' as 'Terceiros'
   const vinculoTypes = useMemo(() => {
@@ -36,13 +36,19 @@ export function DriverRanking() {
     return Array.from(types).sort();
   }, [activeDrivers]);
 
+  const toggleVinculo = (v: string) => {
+    setSelectedVinculos(prev =>
+      prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]
+    );
+  };
+
   const filteredDrivers = useMemo(() => {
-    if (vinculoFilter === 'all') return activeDrivers;
+    if (selectedVinculos.length === 0) return activeDrivers;
     return activeDrivers.filter(d => {
       const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
-      return v === vinculoFilter;
+      return selectedVinculos.includes(v);
     });
-  }, [activeDrivers, vinculoFilter]);
+  }, [activeDrivers, selectedVinculos]);
 
   const startEdit = (driverId: string, currentName: string) => {
     // Strip the "(driverId)" suffix that dataAdapter appends
