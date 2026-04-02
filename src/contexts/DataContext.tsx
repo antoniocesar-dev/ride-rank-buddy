@@ -92,6 +92,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [evaluations, setEvaluations] = useState<EvaluationRecord[]>([]);
   const [manualBlocks, setManualBlocks] = useState<DriverBlockRecord[]>([]);
   const [importedDrivers, setImportedDrivers] = useState<DriverRecord[]>([]);
+  const [routeScores, setRouteScores] = useState<RouteScoreRecord[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const { toast } = useToast();
 
@@ -100,6 +101,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchEvaluations().then(setEvaluations).catch(console.error);
     fetchDriverBlocks().then(setManualBlocks).catch(console.error);
     fetchDrivers().then(setImportedDrivers).catch(console.error);
+    fetchRouteScores().then(setRouteScores).catch(console.error);
   }, [refreshKey]);
 
   const refreshData = useCallback(() => {
