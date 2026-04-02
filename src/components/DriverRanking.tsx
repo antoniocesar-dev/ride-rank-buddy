@@ -177,7 +177,7 @@ export function DriverRanking() {
                   <td className="px-3 py-3 text-right font-mono font-bold text-foreground">
                     {driver.pontuacao}
                   </td>
-                  <td className="px-3 py-3 text-left text-xs text-muted-foreground">{driver.vinculo}</td>
+                  <td className="px-3 py-3 text-left text-xs text-muted-foreground">{!driver.vinculo || driver.vinculo === '—' ? 'Terceiros' : driver.vinculo}</td>
                   <td className="px-3 py-3 text-right font-mono text-muted-foreground">{driver.totalViagens}</td>
                   <td className="px-3 py-3 text-right">
                     {driver.ocorrencias > 0 ? (
