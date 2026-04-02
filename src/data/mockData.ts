@@ -20,6 +20,7 @@ export interface Driver {
   created_at: string;
   etaOrigMetrics: StatusMetrics;
   etaDestMetrics: StatusMetrics;
+  vinculo: string;
 }
 
 export interface Trip {

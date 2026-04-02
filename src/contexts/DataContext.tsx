@@ -3,6 +3,7 @@ import { useTrips } from '@/hooks/useTrips';
 import { transformTrips, deriveDrivers, deriveBlocks, extractUniqueOccurrences, parseDateBR } from '@/services/dataAdapter';
 import { fetchEvaluations, upsertEvaluation, fetchDriverBlocks, unblockDriver as unblockDriverApi, resetManualOverride, createEvaluationLog, fetchDrivers, blockDriver as blockDriverApi, EvaluationRecord, DriverBlockRecord, DriverRecord } from '@/services/supabaseService';
 import { fetchRouteScores, RouteScoreRecord } from '@/services/routeScoreService';
+import { fetchVinculos, getVinculoForDriver, VinculoRecord, clearVinculoCache } from '@/services/vinculoService';
 import type { Trip, Driver, Block } from '@/data/mockData';
 import { mockTrips, mockDrivers, mockBlocks } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
