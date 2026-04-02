@@ -81,8 +81,8 @@ export function TripList({ onEvaluate }: TripListProps) {
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
                   </td>
-                  <td className={`px-4 py-3 text-right font-mono font-bold ${trip.score_final === 3 ? 'text-success' : trip.score_final >= 2 ? 'text-amber-500' : 'text-destructive'}`}>
-                    {trip.score_final}/3
+                  <td className={`px-4 py-3 text-right font-mono font-bold ${trip.score_final === (getRouteBasePoints(routeScores, trip.origin_code, trip.destination_code, trip.data) + 2) ? 'text-success' : trip.score_final >= (getRouteBasePoints(routeScores, trip.origin_code, trip.destination_code, trip.data) + 1) ? 'text-amber-500' : 'text-destructive'}`}>
+                    {trip.score_final}/{getRouteBasePoints(routeScores, trip.origin_code, trip.destination_code, trip.data) + 2}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <Button size="sm" variant={trip.evaluated ? "ghost" : "outline"} className="text-xs h-7 gap-1" onClick={() => onEvaluate(trip.id)}>
