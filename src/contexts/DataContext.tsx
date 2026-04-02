@@ -56,6 +56,7 @@ interface DataContextType {
   setDateRange: (v: DateRange) => void;
   evaluations: EvaluationRecord[];
   manualBlocks: DriverBlockRecord[];
+  routeScores: RouteScoreRecord[];
   refreshData: () => void;
 }
 
