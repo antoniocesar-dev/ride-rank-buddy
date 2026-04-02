@@ -9,6 +9,7 @@ import { QualityChart } from '@/components/QualityChart';
 import { EvaluationForm } from '@/components/EvaluationForm';
 import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
+import { RouteScores } from '@/components/RouteScores';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { DriverImport } from '@/components/DriverImport';
 import { Button } from '@/components/ui/button';
