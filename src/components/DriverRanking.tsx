@@ -70,46 +70,10 @@ export function DriverRanking({ filteredDrivers }: DriverRankingProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base flex-wrap">
+        <CardTitle className="flex items-center gap-2 text-base">
           <Trophy className="h-4 w-4 text-accent" />
           Ranking de Motoristas
-          <div className="flex items-center gap-2 ml-auto">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs h-7">
-                  <Filter className="h-3 w-3" />
-                  Vínculo
-                  {selectedVinculos.length > 0 && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                      {selectedVinculos.length}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56 p-0" align="end">
-                <div className="flex items-center justify-between px-4 py-2.5 border-b">
-                  <span className="text-sm font-medium">Filtrar por vínculo</span>
-                  {selectedVinculos.length > 0 && (
-                    <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setSelectedVinculos([])}>
-                      <X className="h-3 w-3 mr-1" /> Limpar
-                    </Button>
-                  )}
-                </div>
-                <div className="p-2 space-y-1">
-                  {vinculoTypes.map(v => (
-                    <label key={v} className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors">
-                      <Checkbox
-                        checked={selectedVinculos.includes(v)}
-                        onCheckedChange={() => toggleVinculo(v)}
-                      />
-                      <span className="text-xs">{v}</span>
-                    </label>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            <span className="text-xs font-normal text-muted-foreground">{filteredDrivers.length} motoristas</span>
-          </div>
+          <span className="text-xs font-normal text-muted-foreground ml-auto">{filteredDrivers.length} motoristas</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
