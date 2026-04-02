@@ -104,6 +104,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     fetchDriverBlocks().then(setManualBlocks).catch(console.error);
     fetchDrivers().then(setImportedDrivers).catch(console.error);
     fetchRouteScores().then(setRouteScores).catch(console.error);
+    fetchVinculos().then(setVinculos).catch(console.error);
   }, [refreshKey]);
 
   const refreshData = useCallback(() => {
