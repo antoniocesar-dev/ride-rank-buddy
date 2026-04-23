@@ -1,41 +1,91 @@
-import { useState, useMemo } from 'react';
-import { BarChart3, Trophy, FileText, ShieldAlert, Activity, ScrollText, RefreshCw, Route } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { StatsCards } from '@/components/StatsCards';
-import { DriverRanking } from '@/components/DriverRanking';
-import { TripList } from '@/components/TripList';
+import { useMemo, useState } from 'react';
+import { Activity, BarChart3, FileText, RefreshCw, Route, ScrollText, ShieldAlert, Trophy } from 'lucide-react';
 import { BlocksList } from '@/components/BlocksList';
-import { QualityChart } from '@/components/QualityChart';
+import { DateRangeFilter } from '@/components/DateRangeFilter';
+import { DriverImport } from '@/components/DriverImport';
+import { DriverRanking } from '@/components/DriverRanking';
 import { EvaluationForm } from '@/components/EvaluationForm';
 import { EvaluationLogList } from '@/components/EvaluationLogList';
 import { OccurrenceFilter } from '@/components/OccurrenceFilter';
-import { VinculoFilter } from '@/components/VinculoFilter';
+import { QualityChart } from '@/components/QualityChart';
+import { RouteFilter } from '@/components/RouteFilter';
 import { RouteScores } from '@/components/RouteScores';
-import { DateRangeFilter } from '@/components/DateRangeFilter';
-import { DriverImport } from '@/components/DriverImport';
+import { StatsCards } from '@/components/StatsCards';
+import { TripList } from '@/components/TripList';
+import { VinculoFilter } from '@/components/VinculoFilter';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useData } from '@/contexts/DataContext';
+import type { Driver } from '@/data/mockData';
+import { deriveDrivers } from '@/services/dataAdapter';
+import { filterTripsBySelections, getDriverVinculoLabel, getRouteKey, getRouteLabel } from '@/lib/tripFilters';
 
 const Index = () => {
   const [evaluatingTrip, setEvaluatingTrip] = useState<string | null>(null);
-  const { activeDrivers, refreshData, isLoading } = useData();
   const [selectedVinculos, setSelectedVinculos] = useState<string[]>([]);
+  const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
+  const { trips, sheetNoShowTrips, activeDrivers, refreshData, isLoading } = useData();
 
   const vinculoTypes = useMemo(() => {
     const types = new Set<string>();
-    activeDrivers.forEach(d => {
-      types.add(!d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo);
+
+    activeDrivers.forEach(driver => {
+      types.add(getDriverVinculoLabel(driver.vinculo));
     });
+
     return Array.from(types).sort();
   }, [activeDrivers]);
 
+  const driverVinculos = useMemo(() => {
+    return new Map(
+      activeDrivers.map(driver => [driver.id, getDriverVinculoLabel(driver.vinculo)])
+    );
+  }, [activeDrivers]);
+
+  const filteredTrips = useMemo(() => {
+    return filterTripsBySelections(trips, driverVinculos, selectedVinculos, selectedRoutes);
+  }, [trips, driverVinculos, selectedVinculos, selectedRoutes]);
+
+  const filteredSheetNoShowTrips = useMemo(() => {
+    return filterTripsBySelections(sheetNoShowTrips, driverVinculos, selectedVinculos, selectedRoutes);
+  }, [sheetNoShowTrips, driverVinculos, selectedVinculos, selectedRoutes]);
+
   const filteredDrivers = useMemo(() => {
-    if (selectedVinculos.length === 0) return activeDrivers;
-    return activeDrivers.filter(d => {
-      const v = !d.vinculo || d.vinculo === '—' ? 'Terceiros' : d.vinculo;
-      return selectedVinculos.includes(v);
+    const activeDriverMap = new Map(activeDrivers.map(driver => [driver.id, driver]));
+
+    if (selectedVinculos.length === 0 && selectedRoutes.length === 0) {
+      return activeDrivers;
+    }
+
+    return deriveDrivers(filteredTrips)
+      .map((driver): Driver | null => {
+        const existingDriver = activeDriverMap.get(driver.id);
+        if (!existingDriver) return null;
+
+        return {
+          ...driver,
+          nome: existingDriver.nome,
+          status: existingDriver.status,
+          vinculo: existingDriver.vinculo,
+        };
+      })
+      .filter((driver): driver is Driver => driver !== null);
+  }, [activeDrivers, filteredTrips, selectedRoutes, selectedVinculos]);
+
+  const routeOptions = useMemo(() => {
+    const routes = new Map<string, string>();
+
+    trips.forEach(trip => {
+      const key = getRouteKey(trip.origin_code, trip.destination_code);
+      if (!routes.has(key)) {
+        routes.set(key, getRouteLabel(trip.origin_code, trip.destination_code));
+      }
     });
-  }, [activeDrivers, selectedVinculos]);
+
+    return Array.from(routes.entries())
+      .sort((a, b) => a[1].localeCompare(b[1]))
+      .map(([value, label]) => ({ value, label }));
+  }, [trips]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,7 +97,7 @@ const Index = () => {
             </div>
             <div>
               <h1 className="text-sm font-bold tracking-tight">RankingMotoristas</h1>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Sistema de Avaliação</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Sistema de Avaliacao</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -71,7 +121,16 @@ const Index = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <DriverImport />
             <OccurrenceFilter />
-            <VinculoFilter vinculoTypes={vinculoTypes} selectedVinculos={selectedVinculos} setSelectedVinculos={setSelectedVinculos} />
+            <VinculoFilter
+              vinculoTypes={vinculoTypes}
+              selectedVinculos={selectedVinculos}
+              setSelectedVinculos={setSelectedVinculos}
+            />
+            <RouteFilter
+              routeOptions={routeOptions}
+              selectedRoutes={selectedRoutes}
+              setSelectedRoutes={setSelectedRoutes}
+            />
           </div>
         </div>
 
@@ -98,15 +157,23 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="ranking">
-            <DriverRanking filteredDrivers={filteredDrivers} />
+            <DriverRanking filteredDrivers={filteredDrivers} filteredTrips={filteredTrips} />
           </TabsContent>
 
           <TabsContent value="viagens">
-            <TripList onEvaluate={setEvaluatingTrip} selectedVinculos={selectedVinculos} />
+            <TripList
+              onEvaluate={setEvaluatingTrip}
+              selectedVinculos={selectedVinculos}
+              selectedRoutes={selectedRoutes}
+            />
           </TabsContent>
 
           <TabsContent value="qualidade">
-            <QualityChart />
+            <QualityChart
+              filteredTrips={filteredTrips}
+              filteredDrivers={filteredDrivers}
+              filteredNoShowTrips={filteredSheetNoShowTrips}
+            />
           </TabsContent>
 
           <TabsContent value="bloqueios">

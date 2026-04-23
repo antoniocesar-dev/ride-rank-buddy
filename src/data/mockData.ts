@@ -30,6 +30,15 @@ export interface Trip {
   data: string;
   origin_code: string;
   destination_code: string;
+  status_agrupado?: string;
+  no_show_from_sheet?: boolean;
+  source_sheet_field?: string;
+  eta_origin_scheduled?: string;
+  eta_origin_realized?: string;
+  eta_origin_diff_minutes?: number | null;
+  eta_destination_scheduled?: string;
+  eta_destination_realized?: string;
+  eta_destination_diff_minutes?: number | null;
   status_eta: string;
   status_eta_destino: string;
   status_cpt: string;
@@ -121,6 +130,15 @@ for (let i = 0; i < 40; i++) {
     data: `2025-03-${String(1 + (i % 17)).padStart(2, '0')} 07:00`,
     origin_code: 'ORI',
     destination_code: 'DST',
+    status_agrupado: 'FECHADA',
+    no_show_from_sheet: false,
+    source_sheet_field: 'DBLHHISTORICO.status_agrupado',
+    eta_origin_scheduled: `2025-03-${String(1 + (i % 17)).padStart(2, '0')} 07:00`,
+    eta_origin_realized: `2025-03-${String(1 + (i % 17)).padStart(2, '0')} 07:${String((i * 3) % 60).padStart(2, '0')}`,
+    eta_origin_diff_minutes: sEta === 'DELAY' ? 15 : sEta === 'EARLY' ? -10 : 0,
+    eta_destination_scheduled: `2025-03-${String(1 + (i % 17)).padStart(2, '0')} 12:00`,
+    eta_destination_realized: `2025-03-${String(1 + (i % 17)).padStart(2, '0')} 12:${String((i * 5) % 60).padStart(2, '0')}`,
+    eta_destination_diff_minutes: sDest === 'DELAY' ? 20 : sDest === 'EARLY' ? -12 : 0,
     status_eta: sEta,
     status_eta_destino: sDest,
     status_cpt: sCpt,

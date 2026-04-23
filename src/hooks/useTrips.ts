@@ -10,7 +10,7 @@ export function useTrips() {
     queryFn: getTrips,
     staleTime: Infinity,
     retry: 1,
-    enabled: false,
+    enabled: true,
   });
 
   const refresh = useCallback(() => {

@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, useMemo, useCallback, useEffect, ReactNode } from 'react';
 import { useTrips } from '@/hooks/useTrips';
-import { transformTrips, deriveDrivers, deriveBlocks, extractUniqueOccurrences, parseDateBR } from '@/services/dataAdapter';
+import { transformTrips, transformSheetNoShowTrips, deriveDrivers, deriveBlocks, extractUniqueOccurrences, parseDateBR } from '@/services/dataAdapter';
 import { fetchEvaluations, upsertEvaluation, fetchDriverBlocks, unblockDriver as unblockDriverApi, resetManualOverride, createEvaluationLog, fetchDrivers, blockDriver as blockDriverApi, EvaluationRecord, DriverBlockRecord, DriverRecord } from '@/services/supabaseService';
 import { fetchRouteScores, RouteScoreRecord } from '@/services/routeScoreService';
 import { fetchVinculos, getVinculoForDriver, VinculoRecord, clearVinculoCache } from '@/services/vinculoService';
 import type { Trip, Driver, Block } from '@/data/mockData';
-import { mockTrips, mockDrivers, mockBlocks } from '@/data/mockData';
+import type { SheetTrip } from '@/services/sheetsService';
 import { useToast } from '@/hooks/use-toast';
 
 export const DEFAULT_IGNORED_OCCURRENCES = [
@@ -43,6 +43,8 @@ interface DateRange {
 
 interface DataContextType {
   trips: Trip[];
+  sheetTripsRaw: SheetTrip[];
+  sheetNoShowTrips: Trip[];
   drivers: Driver[];
   blocks: Block[];
   activeDrivers: Driver[];
@@ -63,6 +65,8 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType>({
   trips: [],
+  sheetTripsRaw: [],
+  sheetNoShowTrips: [],
   drivers: [],
   blocks: [],
   activeDrivers: [],
@@ -120,15 +124,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return [];
   }, [sheetTrips]);
 
-  const { trips, drivers, blocks, activeDrivers } = useMemo(() => {
+  const { trips, sheetNoShowTrips, drivers, blocks, activeDrivers } = useMemo(() => {
     if (sheetTrips && sheetTrips.length > 0) {
       const normalizeId = (id: string) => id.replace(/\./g, '');
       const driverNameMap = new Map(importedDrivers.map(d => [normalizeId(d.driver_id), d.driver_name]));
 
       let t = transformTrips(sheetTrips, ignoredOccurrences, routeScores);
+      let noShowTrips = transformSheetNoShowTrips(sheetTrips);
 
       if (driverNameMap.size > 0) {
         t = t.map(trip => {
+          const enrichedName = driverNameMap.get(normalizeId(trip.driver_id));
+          return enrichedName ? { ...trip, driverName: enrichedName } : trip;
+        });
+
+        noShowTrips = noShowTrips.map(trip => {
           const enrichedName = driverNameMap.get(normalizeId(trip.driver_id));
           return enrichedName ? { ...trip, driverName: enrichedName } : trip;
         });
@@ -136,6 +146,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
       if (dateRange.from || dateRange.to) {
         t = t.filter(trip => {
+          const tripDate = parseDateBR(trip.data);
+          if (!tripDate) return false;
+          if (dateRange.from && tripDate < dateRange.from) return false;
+          if (dateRange.to) {
+            const endOfDay = new Date(dateRange.to);
+            endOfDay.setHours(23, 59, 59, 999);
+            if (tripDate > endOfDay) return false;
+          }
+          return true;
+        });
+
+        noShowTrips = noShowTrips.filter(trip => {
           const tripDate = parseDateBR(trip.data);
           if (!tripDate) return false;
           if (dateRange.from && tripDate < dateRange.from) return false;
@@ -184,14 +206,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
       // All non-blocked drivers appear in ranking
       const active = adjustedDrivers.filter(dr => dr.status !== 'BLOQUEADO');
 
-      return { trips: t, drivers: adjustedDrivers, blocks: b, activeDrivers: active };
+      return { trips: t, sheetNoShowTrips: noShowTrips, drivers: adjustedDrivers, blocks: b, activeDrivers: active };
     }
-    if (!isLoading) {
-      const active = mockDrivers.filter(d => d.status !== 'BLOQUEADO');
-      return { trips: mockTrips, drivers: mockDrivers, blocks: mockBlocks, activeDrivers: active };
-    }
-    return { trips: [] as Trip[], drivers: [] as Driver[], blocks: [] as Block[], activeDrivers: [] as Driver[] };
-  }, [sheetTrips, ignoredOccurrences, isLoading, evaluations, dateRange, manualBlocks, importedDrivers, routeScores, vinculos]);
+    return {
+      trips: [] as Trip[],
+      sheetNoShowTrips: [] as Trip[],
+      drivers: [] as Driver[],
+      blocks: [] as Block[],
+      activeDrivers: [] as Driver[],
+    };
+  }, [sheetTrips, ignoredOccurrences, evaluations, dateRange, manualBlocks, importedDrivers, routeScores, vinculos]);
 
   const evaluateTrip = useCallback(async (tripId: string, driverId: string, driverName: string, evaluation: EvaluationData) => {
     const operador = evaluation.operador || 'Ana Costa';
@@ -301,7 +325,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   return (
     <DataContext.Provider value={{
-      trips, drivers, blocks, activeDrivers, isLoading, isError,
+      trips, sheetTripsRaw: sheetTrips ?? [], sheetNoShowTrips, drivers, blocks, activeDrivers, isLoading, isError,
       uniqueOccurrences, ignoredOccurrences, setIgnoredOccurrences,
       evaluateTrip, unblockDriver: unblockDriverFn,
       dateRange, setDateRange, evaluations, manualBlocks, routeScores, refreshData,
