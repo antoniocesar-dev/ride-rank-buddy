@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install all deps (including devDeps needed by vite build)
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source (respects .dockerignore — node_modules and dist are excluded)
 COPY . .
