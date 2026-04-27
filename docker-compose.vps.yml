@@ -1,0 +1,22 @@
+# docker-compose.vps.yml — VPS overrides for Ride Rank Buddy
+#
+# Usage (IP-only, no domain):
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d
+#
+# Usage (with domain + TLS, after DNS is live):
+#   DOMAIN=riderank.grupolamonica.com.br \
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml -f docker-compose.domain.yml up -d
+#
+# Requires on VPS:
+#   - .env in this directory (real Supabase credentials)
+#   - Platform Traefik running: /opt/platform/traefik/
+#   - Docker network: platform_public (created by platform)
+
+services:
+
+  frontend:
+    build:
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY:-}
+    # No ports: Traefik handles edge traffic on port 80/443

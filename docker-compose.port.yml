@@ -1,0 +1,22 @@
+# docker-compose.port.yml — acesso direto por porta (sem domínio, sem Traefik)
+#
+# Uso TEMPORÁRIO enquanto não há domínio configurado.
+# Acesso: http://76.13.169.177:8081
+#
+# Pré-requisito na VPS:
+#   sudo ufw allow 8081/tcp
+#
+# Subir:
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml -f docker-compose.port.yml up -d --build
+#
+# Quando o domínio estiver pronto:
+#   sudo ufw delete allow 8081/tcp
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml -f docker-compose.domain.yml up -d
+
+services:
+
+  frontend:
+    labels:
+      - "traefik.enable=false"
+    ports:
+      - "8081:80"

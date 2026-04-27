@@ -1,0 +1,27 @@
+# docker-compose.domain.yml — HTTPS/domain overlay for Ride Rank Buddy
+#
+# Apply AFTER docker-compose.vps.yml when DNS is live:
+#   DOMAIN=riderank.grupolamonica.com.br \
+#   docker compose -f docker-compose.yml -f docker-compose.vps.yml -f docker-compose.domain.yml up -d
+#
+# This overlay adds:
+#   - HTTPS Traefik routers with Let's Encrypt TLS
+#   - HTTP → HTTPS redirect
+#   - Host-based routing (more specific than PathPrefix, takes priority)
+
+services:
+
+  frontend:
+    labels:
+      # HTTPS router — host-based, higher priority
+      - "traefik.http.routers.rr-frontend-https.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.rr-frontend-https.entrypoints=websecure"
+      - "traefik.http.routers.rr-frontend-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.rr-frontend-https.priority=10"
+      - "traefik.http.services.rr-frontend.loadbalancer.server.port=80"
+      # HTTP → HTTPS redirect
+      - "traefik.http.routers.rr-frontend-http.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.rr-frontend-http.entrypoints=web"
+      - "traefik.http.routers.rr-frontend-http.middlewares=rr-https-redirect"
+      - "traefik.http.middlewares.rr-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.rr-https-redirect.redirectscheme.permanent=true"
