@@ -1,8 +1,9 @@
 # docker-compose.yml — Ride Rank Buddy production stack
 # Pure frontend SPA (Vite + React + Supabase). No backend container.
 # Routing handled by platform-level Traefik (platform_public network).
+# Served at /ranking (IP-only) or https://<DOMAIN>/ranking (domain mode).
 #
-# IP-only mode (no domain):
+# IP-only mode:
 #   docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d
 #
 # Domain mode (after DNS is live):
@@ -33,11 +34,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=platform_public"
-      # IP routing (no domain) — catch-all, lowest priority
-      - "traefik.http.routers.rr-frontend.rule=PathPrefix(`/`)"
+      # PathPrefix /ranking — higher priority than Cargas catch-all (priority 1)
+      - "traefik.http.routers.rr-frontend.rule=PathPrefix(`/ranking`)"
       - "traefik.http.routers.rr-frontend.entrypoints=web"
-      - "traefik.http.routers.rr-frontend.priority=1"
+      - "traefik.http.routers.rr-frontend.priority=5"
+      - "traefik.http.routers.rr-frontend.middlewares=rr-stripprefix"
       - "traefik.http.services.rr-frontend.loadbalancer.server.port=80"
+      # Strip /ranking before forwarding to nginx (nginx stays path-agnostic)
+      - "traefik.http.middlewares.rr-stripprefix.stripprefix.prefixes=/ranking"
 
 # ── Networks ──────────────────────────────────────────────────────────────
 networks:
